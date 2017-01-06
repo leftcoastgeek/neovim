@@ -26,6 +26,10 @@ install all fonts from the install script here: https://github.com/ryanoasis/ner
 or install one from the repo
 `cd ~/Library/Fonts && curl -fLo "Meslo LG L Regular for Powerline Nerd Font Complete Mono.otf" https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Meslo/L/complete/Meslo%20LG%20L%20Regular%20for%20Powerline%20Nerd%20Font%20Complete%20Mono.otf`
 
+or 
+
+`cd ~/Library/Fonts && curl -fLo "Inconsolata for Powerline Nerd Font Complete Mono.otf" https://github.com/ryanoasis/nerd-fonts/blob/master/patched-fonts/Inconsolata/complete/Inconsolata%20for%20Powerline%20Nerd%20Font%20Complete%20Mono.otf`
+
 set Iterm's font, be sure to set the font and non ascii font. -> Edit Profile -> text -> fonts
 
 open neoVim and install plugins
