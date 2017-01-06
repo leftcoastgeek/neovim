@@ -7,13 +7,16 @@ call plug#begin('~/.vim/plugged')
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
+"Plug 'neomake/neomake' | Plug 'dojoteef/neomake-autolint'
+Plug 'w0rp/ale'
 Plug 'scrooloose/nerdcommenter'
 Plug 'kien/ctrlp.vim'
-Plug 'neomake/neomake'
 Plug 'junegunn/vim-easy-align'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'airblade/vim-gitgutter'
 Plug 'sheerun/vim-polyglot'
+Plug 'flowtype/vim-flow'
+
 
 " Searcher
 Plug 'mileszs/ack.vim'
@@ -22,16 +25,9 @@ Plug 'mileszs/ack.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'mhartington/oceanic-next'
-Plug 'altercation/vim-colors-solarized'
-
-" Group dependencies, vim-snippets depends on ultisnips
-"Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+Plug 'arakashic/nvim-colors-solarized'
 
 call plug#end()
-
-" Airline
-" let g:airline_powerline_fonts = 1
-" let g:airline#extensions#tabline#enabled = 1
 
 " Disable netrw /
 let g:loaded_netrw        = 1
@@ -44,11 +40,6 @@ let g:deoplete#enable_at_startup = 1
 " SudoEdit should ask password on terminal only
 let g:sudo_no_gui=1
 
-" Theme activation
-"let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-" colorscheme gruvbox
-" set background=dark
-
 " System clipboard integration
 set clipboard=unnamedplus
 
@@ -56,7 +47,7 @@ set clipboard=unnamedplus
 exe 'source ' . s:path . '/plugins/nerdtree.vim'
 exe 'source ' . s:path . '/plugins/nerdcommenter.vim'
 exe 'source ' . s:path . '/plugins/ctrlp.vim'
-exe 'source ' . s:path . '/plugins/neomake.vim'
+exe 'source ' . s:path . '/plugins/ale.vim'
 
 
 " Use deoplete.
@@ -72,6 +63,18 @@ let g:deoplete#enable_camel_case = 1
 "
 " ======= Defaults =======
 "
+set encoding=utf8
+set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
+
+" Theme activation
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+set termguicolors
+set background=dark
+colorscheme solarized
+
+" Airline
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
 
 " Based on Janus defaults
 set number            " Show line numbers
@@ -102,10 +105,6 @@ set listchars+=extends:>          " The character to show in the last column whe
                                   " off and the line continues beyond the right of the screen
 set listchars+=precedes:<         " The character to show in the last column when wrap is
                                   " off and the line continues beyond the left of the screen
-
-" Set Default Colorscheme
-set background=dark
-colorscheme solarized
 
 ""
 "" Searching
@@ -147,6 +146,8 @@ set wildignore+=*.swp,*~,._*
 
 set backupdir^=~/.vim/_backup//    " where to put backup files.
 set directory^=~/.vim/_temp//      " where to put swap files.
+set undodir=~/.vim/_undo//         " persistient undo.
+set undofile
 
 "
 " ======= End Defaults =======
