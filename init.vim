@@ -22,6 +22,7 @@ Plug 'mileszs/ack.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'mhartington/oceanic-next'
+Plug 'altercation/vim-colors-solarized'
 
 " Group dependencies, vim-snippets depends on ultisnips
 "Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
@@ -103,7 +104,8 @@ set listchars+=precedes:<         " The character to show in the last column whe
                                   " off and the line continues beyond the left of the screen
 
 " Set Default Colorscheme
-:colorscheme elflord
+set background=dark
+colorscheme solarized
 
 ""
 "" Searching
