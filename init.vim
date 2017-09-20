@@ -4,7 +4,7 @@ let s:path = expand('<sfile>:p:h')
 "
 call plug#begin('~/.vim/plugged')
 
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
 "Plug 'neomake/neomake' | Plug 'dojoteef/neomake-autolint'
@@ -15,8 +15,10 @@ Plug 'junegunn/vim-easy-align'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'airblade/vim-gitgutter'
 Plug 'sheerun/vim-polyglot'
-Plug 'flowtype/vim-flow'
-
+"Plug 'flowtype/vim-flow'
+Plug 'rbgrouleff/bclose.vim'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'moll/vim-node'
 
 " Searcher
 Plug 'mileszs/ack.vim'
@@ -302,9 +304,13 @@ else
   vmap <C-k> [egv
   vmap <C-j> ]egv
 
+""
+"" Mouse
+""
   " Make shift-insert work like in Xterm
   map <S-Insert> <MiddleMouse>
   map! <S-Insert> <MiddleMouse>
+  :set mouse=nicr
 
   " Map Control-# to switch tabs
   map  <C-0> 0gt
