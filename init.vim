@@ -4,19 +4,23 @@ let s:path = expand('<sfile>:p:h')
 "
 call plug#begin('~/.vim/plugged')
 
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
 "Plug 'neomake/neomake' | Plug 'dojoteef/neomake-autolint'
 Plug 'w0rp/ale'
 Plug 'scrooloose/nerdcommenter'
 Plug 'kien/ctrlp.vim'
-Plug 'junegunn/vim-easy-align'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'npm install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql'] }
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'airblade/vim-gitgutter'
 Plug 'sheerun/vim-polyglot'
-Plug 'flowtype/vim-flow'
-
+"Plug 'flowtype/vim-flow'
+Plug 'rbgrouleff/bclose.vim'
+Plug 'francoiscabrol/ranger.vim'
+Plug 'moll/vim-node'
 
 " Searcher
 Plug 'mileszs/ack.vim'
@@ -149,6 +153,9 @@ set directory^=~/.vim/_temp//      " where to put swap files.
 set undodir=~/.vim/_undo//         " persistient undo.
 set undofile
 
+" Set 7 lines to the cursor - when moving vertically using j/k
+set so=7
+
 "
 " ======= End Defaults =======
 "
@@ -176,8 +183,14 @@ imap <silent> <F4> <ESC>:set invpaste<CR>:set paste?<CR>
 " format the entire file
 nnoremap <leader>fef :normal! gg=G``<CR>
 
+" quick save
+map <leader>w :w<ENTER>
+
 "Nerd Tree Mappings
 map <C-n> :NERDTreeToggle<CR>
+
+"Nerdcommenter
+map <leader>c v<leader>c<space><ESC>
 
 " upper/lower word
 nmap <leader>u mQviwU`Q
@@ -302,9 +315,13 @@ else
   vmap <C-k> [egv
   vmap <C-j> ]egv
 
+""
+"" Mouse
+""
   " Make shift-insert work like in Xterm
   map <S-Insert> <MiddleMouse>
   map! <S-Insert> <MiddleMouse>
+  :set mouse=nicr
 
   " Map Control-# to switch tabs
   map  <C-0> 0gt
@@ -330,11 +347,23 @@ else
 endif
 
 ""
+"" Tabs
+""
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+""
 "" Command-Line Mappings
 ""
 
 " After whitespace, insert the current directory into a command-line path
 cnoremap <expr> <C-P> getcmdline()[getcmdpos()-2] ==# ' ' ? expand('%:p:h') : "\<C-P>"
+
+" custom reload command
+command! Reload execute $MYVIMRC
+
 
 "
 " ======= End Key Mappings =======
