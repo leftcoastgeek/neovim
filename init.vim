@@ -21,6 +21,9 @@ Plug 'sheerun/vim-polyglot'
 Plug 'rbgrouleff/bclose.vim'
 Plug 'francoiscabrol/ranger.vim'
 Plug 'moll/vim-node'
+Plug 'tpope/vim-fugitive'
+Plug 'tommcdo/vim-fugitive-blame-ext'
+Plug 'yegappan/mru'
 
 " Searcher
 Plug 'mileszs/ack.vim'
