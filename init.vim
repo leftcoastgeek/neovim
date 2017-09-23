@@ -380,15 +380,15 @@ cnoremap <expr> <C-P> getcmdline()[getcmdpos()-2] ==# ' ' ? expand('%:p:h') : "\
 " custom reload command
 command! Reload execute $MYVIMRC
 
-" terminal
-command! -nargs=* T split | terminal <args>
-command! -nargs=* VT vsplit | terminal <args>
+" terminal - TODO maybe use me
+"command! -nargs=* T split | terminal <args>
+"command! -nargs=* VT vsplit | terminal <args>
 
-" terminal vertical split
-map <leader>vst :vsplit | terminal
+" terminal vertical split - TODO FIX ME
+"map <leader>vst vsplit|terminal
 
-" terminal horizonal split
-map <leader>st :split | terminal
+" terminal horizonal split -  TODO Fix ME
+"map <leader>st split|terminal
 
 
 "
