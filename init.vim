@@ -70,6 +70,7 @@ let g:deoplete#enable_camel_case = 1
 "
 " ======= Defaults =======
 "
+
 set encoding=utf8
 set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
 
@@ -188,6 +189,18 @@ nnoremap <leader>fef :normal! gg=G``<CR>
 
 " quick save
 map <leader>w :w<ENTER>
+
+" " Copy to clipboard
+vnoremap  <leader>y  "+y
+nnoremap  <leader>Y  "+yg_
+nnoremap  <leader>y  "+y
+nnoremap  <leader>yy  "+yy
+
+" " Paste from clipboard
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
+vnoremap <leader>p "+p
+vnoremap <leader>P "+P
 
 "Nerd Tree Mappings
 map <C-n> :NERDTreeToggle<CR>
@@ -366,6 +379,16 @@ cnoremap <expr> <C-P> getcmdline()[getcmdpos()-2] ==# ' ' ? expand('%:p:h') : "\
 
 " custom reload command
 command! Reload execute $MYVIMRC
+
+" terminal
+command! -nargs=* T split | terminal <args>
+command! -nargs=* VT vsplit | terminal <args>
+
+" terminal vertical split
+map <leader>vst :vsplit | terminal
+
+" terminal horizonal split
+map <leader>st :split | terminal
 
 
 "
