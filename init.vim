@@ -1,396 +1,440 @@
-let s:path = expand('<sfile>:p:h')
+scriptencoding utf-8
+source ~/.config/nvim/plugins.vim
+
+" ============================================================================ "
+" ===                           EDITING OPTIONS                            === "
+" ============================================================================ "
+
+" Remap leader key to SPC and ,
+nnoremap <space> <nop>
+let mapleader = "\<space>"
+let maplocalleader = ","
+
+" Disable line numbers
+" set nonumber
+
+" === netrw / vim-Vinegar ish === "
+" show dotFiles
+let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+augroup ProjectDrawer
+  autocmd!
+  autocmd VimEnter * :Vexplore
+augroup END
+
+" Don't show last command
+set noshowcmd
+
+" Yank and paste with the system clipboard
+set clipboard=unnamed
+
+" Hides buffers instead of closing them
+set hidden
+
+" === TAB/Space settings === "
+" Insert spaces when TAB is pressed.
+set expandtab
+
+" Change number of spaces that a <Tab> counts for during editing ops
+set softtabstop=2
+
+" Indentation amount for < and > commands.
+set shiftwidth=2
+
+" do not wrap long lines by default
+set nowrap
+
+" Don't highlight current cursor line
+set nocursorline
+
+" Disable line/column number in status line
+" Shows up in preview window when airline is disabled if not
+set noruler
+
+" Only one line for command line
+set cmdheight=2
+
+" === Completion Settings === "
+
+" Don't give completion messages like 'match 1 of 2'
+" or 'The only match'
+set shortmess+=c
+
+" ============================================================================ "
+" ===                           PLUGIN SETUP                               === "
+" ============================================================================ "
+
+" Wrap in try/catch to avoid errors on initial install before plugin is available
+try
+" === Denite setup ==="
+" Use ripgrep for searching current directory for files
+" By default, ripgrep will respect rules in .gitignore
+"   --files: Print each file that would be searched (but don't search)
+"   --glob:  Include or exclues files for searching that match the given glob
+"            (aka ignore .git files)
 "
-" ======= NeoVim Plugins =======
-"
-call plug#begin('~/.vim/plugged')
+call denite#custom#var('file/rec', 'command', ['rg', '--files', '--glob', '!.git'])
 
-Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-Plug 'ryanoasis/vim-devicons'
-"Plug 'neomake/neomake' | Plug 'dojoteef/neomake-autolint'
-Plug 'w0rp/ale'
-Plug 'scrooloose/nerdcommenter'
-Plug 'kien/ctrlp.vim'
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'npm install',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql'] }
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'airblade/vim-gitgutter'
-Plug 'sheerun/vim-polyglot'
-"Plug 'flowtype/vim-flow'
-Plug 'rbgrouleff/bclose.vim'
-Plug 'francoiscabrol/ranger.vim'
-Plug 'moll/vim-node'
-Plug 'tpope/vim-fugitive'
-Plug 'tommcdo/vim-fugitive-blame-ext'
-Plug 'yegappan/mru'
+" Use ripgrep in place of "grep"
+call denite#custom#var('grep', 'command', ['rg'])
 
-" Searcher
-Plug 'mileszs/ack.vim'
+" Custom options for ripgrep
+"   --vimgrep:  Show results with every match on it's own line
+"   --hidden:   Search hidden directories and files
+"   --heading:  Show the file name above clusters of matches from each file
+"   --S:        Search case insensitively if the pattern is all lowercase
+call denite#custom#var('grep', 'default_opts', ['--hidden', '--vimgrep', '--heading', '-S'])
 
-" Themes
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'mhartington/oceanic-next'
-Plug 'arakashic/nvim-colors-solarized'
+" Recommended defaults for ripgrep via Denite docs
+call denite#custom#var('grep', 'recursive_opts', [])
+call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+call denite#custom#var('grep', 'separator', ['--'])
+call denite#custom#var('grep', 'final_opts', [])
 
-call plug#end()
+" Remove date from buffer list
+call denite#custom#var('buffer', 'date_format', '')
 
-" Disable netrw /
-let g:loaded_netrw        = 1
-let g:loaded_netrwPlugin  = 1
+" Custom options for Denite
+"   auto_resize             - Auto resize the Denite window height automatically.
+"   prompt                  - Customize denite prompt
+"   direction               - Specify Denite window direction as directly below current pane
+"   winminheight            - Specify min height for Denite window
+"   highlight_mode_insert   - Specify h1-CursorLine in insert mode
+"   prompt_highlight        - Specify color of prompt
+"   highlight_matched_char  - Matched characters highlight
+"   highlight_matched_range - matched range highlight
+let s:denite_options = {'default' : {
+\ 'auto_resize': 1,
+\ 'prompt': 'λ:',
+\ 'direction': 'rightbelow',
+\ 'winminheight': '10',
+\ 'highlight_mode_insert': 'Visual',
+\ 'highlight_mode_normal': 'Visual',
+\ 'prompt_highlight': 'Function',
+\ 'highlight_matched_char': 'Function',
+\ 'highlight_matched_range': 'Normal'
+\ }}
 
-" Using silver searcher requres install of silver searcher
-let g:ackprg = 'ag --nogroup --nocolor --column'
-let g:deoplete#enable_at_startup = 1
+" Loop through denite options and enable them
+function! s:profile(opts) abort
+  for l:fname in keys(a:opts)
+    for l:dopt in keys(a:opts[l:fname])
+      call denite#custom#option(l:fname, l:dopt, a:opts[l:fname][l:dopt])
+    endfor
+  endfor
+endfunction
 
-" SudoEdit should ask password on terminal only
-let g:sudo_no_gui=1
+call s:profile(s:denite_options)
+catch
+  echo 'Denite not installed. It should work after running :PlugInstall'
+endtry
 
-" System clipboard integration
-set clipboard=unnamedplus
+" === Coc.nvim === "
+" use <tab> for trigger completion and navigate to next complete item
+" function! s:check_back_space() abort
+"   let col = col('.') - 1
+"   return !col || getline('.')[col - 1]  =~ '\s'
+" endfunction
 
-" plugin configurations
-exe 'source ' . s:path . '/plugins/nerdtree.vim'
-exe 'source ' . s:path . '/plugins/nerdcommenter.vim'
-exe 'source ' . s:path . '/plugins/ctrlp.vim'
-exe 'source ' . s:path . '/plugins/ale.vim'
+" inoremap <silent><expr> <TAB>
+"       \ pumvisible() ? "\<C-n>" :
+"       \ <SID>check_back_space() ? "\<TAB>" :
+"       \ coc#refresh()
+
+"Close preview window when completion is done.
+" autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
+" === NeoSnippet === "
+" Map <C-k> as shortcut to activate snippet if available
+imap <C-k> <Plug>(neosnippet_expand_or_jump)
+smap <C-k> <Plug>(neosnippet_expand_or_jump)
+xmap <C-k> <Plug>(neosnippet_expand_target)
+
+" Load custom snippets from snippets folder
+let g:neosnippet#snippets_directory='~/.config/nvim/snippets'
+
+" Hide conceal markers
+let g:neosnippet#enable_conceal_markers = 0
 
 
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#enable_ignore_case = 1
-let g:deoplete#enable_smart_case = 1
-let g:deoplete#enable_camel_case = 1
+" === Rainbow === "
+let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
 
-"
-" ======= End NeoVim Plugins =======
-"
+" === PAR EDIT === "
+" let g:paredit_mode = 1
 
-"
-" ======= Defaults =======
-"
+" === NERDTree === "
+" Show hidden files/directories
+let g:NERDTreeShowHidden = 1
 
-set encoding=utf8
-set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
+" Remove bookmarks and help text from NERDTree
+let g:NERDTreeMinimalUI = 1
 
-" Theme activation
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-set termguicolors
-set background=dark
-colorscheme solarized
+" Custom icons for expandable/expanded directories
+let g:NERDTreeDirArrowExpandable = '⬏'
+let g:NERDTreeDirArrowCollapsible = '⬎'
 
-" Airline
+" Hide certain files and directories from NERDTree
+let g:NERDTreeIgnore = ['^\.DS_Store$', '^tags$', '\.git$[[dir]]', '\.idea$[[dir]]', '\.sass-cache$']
+
+" Wrap in try/catch to avoid errors on initial install before plugin is available
+try
+
+" === Vim airline ==== "
+" Enable extensions
+let g:airline_extensions = ['branch', 'hunks']
+",'coc']
+
+" Update section z to just have line number
+let g:airline_section_z = airline#section#create(['linenr'])
+
+" Do not draw separators for empty sections (only for the active window) >
+let g:airline_skip_empty_sections = 1
+
+" Smartly uniquify buffers names with similar filename, suppressing common parts of paths.
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+
+" Custom setup that removes filetype/whitespace from default vim airline bar
+let g:airline#extensions#default#layout = [['a', 'b', 'c'], ['x', 'z', 'warning', 'error']]
+
+" let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
+
+" let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
+
+" Configure error/warning section to use coc.nvim
+" let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+" let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+
+" Hide the Nerdtree status line to avoid clutter
+let g:NERDTreeStatusline = ''
+
+" Disable vim-airline in preview mode
+let g:airline_exclude_preview = 1
+
+" Enable powerline fonts
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
 
-" Based on Janus defaults
-set number            " Show line numbers
-set ruler             " Show line and column number
-syntax enable         " Turn on syntax highlighting allowing local overrides
+" Enable caching of syntax highlighting groups
+let g:airline_highlighting_cache = 1
 
-""
-"" Whitespace
-""
+" Define custom airline symbols
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
 
-set nowrap                        " don't wrap lines
-set tabstop=2                     " a tab is two spaces
-set shiftwidth=2                  " an autoindent (with <<) is two spaces
-set expandtab                     " use spaces, not tabs
-set list                          " Show invisible characters
-set backspace=indent,eol,start    " backspace through everything in insert mode
+" unicode symbols
+let g:airline_left_sep = '❮'
+let g:airline_right_sep = '❯'
 
-"
-" Split panes
-set splitright
+" Don't show git changes to current file in airline
+let g:airline#extensions#hunks#enabled=0
+
+catch
+  echo 'Airline not installed. It should work after running :PlugInstall'
+endtry
+
+" === echodoc === "
+" Enable echodoc on startup
+let g:echodoc#enable_at_startup = 1
+
+" === vim-javascript === "
+" Enable syntax highlighting for JSDoc
+let g:javascript_plugin_jsdoc = 1
+
+" === vim-jsx === "
+" Highlight jsx syntax even in non .jsx files
+let g:jsx_ext_required = 0
+
+" === javascript-libraries-syntax === "
+let g:used_javascript_libs = 'underscore,requirejs,chai,jquery'
+
+" === Signify === "
+let g:signify_sign_delete = '-'
+
+" === Ale === "
+let g:ale_linters = {'javascript': ['standard']}
+
+
+" ============================================================================ "
+" ===                                UI                                    === "
+" ============================================================================ "
+
+" Enable true color support
+set termguicolors
+
+" Editor theme
+set background=dark
+colorscheme solarized8
+let g:solarized_visibility="low"
+
+" Vim airline theme
+let g:airline_theme='solarized'
+
+" Add custom highlights in method that is executed every time a
+" colorscheme is sourced
+" See https://gist.github.com/romainl/379904f91fa40533175dfaec4c833f2f for
+" details
+function! MyHighlights() abort
+  " Hightlight trailing whitespace
+  highlight Trail ctermbg=red guibg=red
+  call matchadd('Trail', '\s\+$', 100)
+endfunction
+
+augroup MyColors
+  autocmd!
+  autocmd ColorScheme * call MyHighlights()
+augroup END
+
+" Change vertical split character to be a space (essentially hide it)
+set fillchars+=vert:.
+
+" Set preview window to appear at bottom
 set splitbelow
 
-" List chars
-set listchars=""                  " Reset the listchars
-set listchars=tab:\ \             " a tab should display as "  ", trailing whitespace as "."
-set listchars+=trail:.            " show trailing spaces as dots
-set listchars+=extends:>          " The character to show in the last column when wrap is
-                                  " off and the line continues beyond the right of the screen
-set listchars+=precedes:<         " The character to show in the last column when wrap is
-                                  " off and the line continues beyond the left of the screen
+" Don't dispay mode in command line (airilne already shows it)
+set noshowmode
 
-""
-"" Searching
-""
+"deploete "
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#keyword_patterns = {}
+let g:deoplete#keyword_patterns.clojure = '[\w!$%&*+/:<=>?@\^_~\-\.#]*'
+let g:deoplete#sources = {'_': ['ale']}
 
-set hlsearch    " highlight matches
-set incsearch   " incremental searching
-set ignorecase  " searches are case insensitive...
-set smartcase   " ... unless they contain at least one capital letter
+" " coc.nvim color changes
+" hi! link CocErrorSign WarningMsg
+" hi! link CocWarningSign Number
+" hi! link CocInfoSign Type
 
-""
-"" Wild settings
-""
+" " Make background transparent for many things
+" hi! Normal ctermbg=NONE guibg=NONE
+" hi! NonText ctermbg=NONE guibg=NONE
+" hi! LineNr ctermfg=NONE guibg=NONE
+" hi! SignColumn ctermfg=NONE guibg=NONE
+" hi! StatusLine guifg=#16252b guibg=#6699CC
+" hi! StatusLineNC guifg=#16252b guibg=#16252b
 
-" TODO: Investigate the precise meaning of these settings
-" set wildmode=list:longest,list:full
+" " Try to hide vertical spit and end of buffer symbol
+" hi! VertSplit gui=NONE guifg=#17252c guibg=#17252c
+" hi! EndOfBuffer ctermbg=NONE ctermfg=NONE guibg=#17252c guifg=#17252c
 
-" Disable output and VCS files
-set wildignore+=*.o,*.out,*.obj,.git,*.rbc,*.rbo,*.class,.svn,*.gem
+" " Customize NERDTree directory
+" hi! NERDTreeCWD guifg=#99c794
 
-" Disable archive files
-set wildignore+=*.zip,*.tar.gz,*.tar.bz2,*.rar,*.tar.xz
+" " Make background color transparent for git changes
+" hi! SignifySignAdd guibg=NONE
+" hi! SignifySignDelete guibg=NONE
+" hi! SignifySignChange guibg=NONE
 
-" Ignore bundler and sass cache
-set wildignore+=*/vendor/gems/*,*/vendor/cache/*,*/.bundle/*,*/.sass-cache/*
+" " Highlight git change signs
+" hi! SignifySignAdd guifg=#99c794
+" hi! SignifySignDelete guifg=#ec5f67
+" hi! SignifySignChange guifg=#c594c5
 
-" Ignore librarian-chef, vagrant, test-kitchen and Berkshelf cache
-set wildignore+=*/tmp/librarian/*,*/.vagrant/*,*/.kitchen/*,*/vendor/cookbooks/*
+" Call method on window enter
+augroup WindowManagement
+  autocmd!
+  autocmd WinEnter * call Handle_Win_Enter()
+augroup END
 
-" Ignore rails temporary asset caches
-set wildignore+=*/tmp/cache/assets/*/sprockets/*,*/tmp/cache/assets/*/sass/*
+" Change highlight group of preview window when open
+function! Handle_Win_Enter()
+  if &previewwindow
+    setlocal winhighlight=Normal:MarkdownError
+  endif
+endfunction
 
-" Disable temp and backup files
-set wildignore+=*.swp,*~,._*
+" ============================================================================ "
+" ===                             KEY MAPPINGS                             === "
+" ============================================================================ "
 
-""
-"" Backup and swap files
-""
+" === Denite shorcuts === "
+"   ;         - Browser currently open buffers
+"   <leader>t - Browse list of files in current directory
+"   <leader>g - Search current directory for occurences of given term and
+"   close window if no results
+"   <leader>j - Search current directory for occurences of word under cursor
+nmap ; :Denite buffer -split=floating -winrow=1<CR>
+nmap <leader>t :Denite file/rec -split=floating -winrow=1<CR>
+nnoremap <leader>g :<C-u>Denite grep:. -no-empty -mode=normal<CR>
+nnoremap <leader>j :<C-u>DeniteCursorWord grep:. -mode=normal<CR>
 
-set backupdir^=~/.vim/_backup//    " where to put backup files.
-set directory^=~/.vim/_temp//      " where to put swap files.
-set undodir=~/.vim/_undo//         " persistient undo.
-set undofile
+" === Nerdtree shorcuts === "
+"  <leader>n - Toggle NERDTree on/off
+"  <leader>f - Opens current file location in NERDTree
+" nmap <leader>n :NERDTreeToggle<CR>
+" nmap <leader>f :NERDTreeFind<CR>
 
-" Set 7 lines to the cursor - when moving vertically using j/k
-set so=7
+"   <Space> - PageDown
+"   -       - PageUp
+noremap <Space> <PageDown>
+noremap - <PageUp>
 
-"
-" ======= End Defaults =======
-"
+" " === coc.nvim === "
+" nmap <silent> <leader>dd <Plug>(coc-definition)
+" nmap <silent> <leader>dr <Plug>(coc-references)
+" nmap <silent> <leader>dj <Plug>(coc-implementation)
 
-"
-" ======= Key Mappings =======
-"
+" === vim-better-whitespace === "
+"   <leader>y - Automatically remove trailing whitespace
+nmap <leader>y :StripWhitespace<CR>
 
-""
-"" General Mappings (Normal, Visual, Operator-pending)
-""
-let mapleader = "\<Space>"
+" === Search shorcuts === "
+"   <leader>h - Find and replace
+"   <leader>/ - Claer highlighted search terms while preserving history
+map <leader>h :%s///<left><left>
+nmap <silent> <leader>/ :nohlsearch<CR>
 
-" CtrlP Mappings
-nnoremap <leader>o :CtrlP<CR>
-nnoremap <leader>b :CtrlPBuffer<CR>
-nnoremap <leader>m :CtrlPMRUFiles<CR>
-nnoremap <leader>t :CtrlPTag<CR>
-nnoremap <leader>a :Ack!<Space>
+" === Easy-motion shortcuts ==="
+"   <leader>w - Easy-motion highlights first word letters bi-directionally
+map <leader>w <Plug>(easymotion-bd-w)
 
-" Toggle paste mode
-nmap <silent> <F4> :set invpaste<CR>:set paste?<CR>
-imap <silent> <F4> <ESC>:set invpaste<CR>:set paste?<CR>
+" Allows you to save files you opened without write permissions via sudo
+cmap w!! w !sudo tee %
 
-" format the entire file
-nnoremap <leader>fef :normal! gg=G``<CR>
+" === vim-jsdoc shortcuts ==="
+" Generate jsdoc for function under cursor
+nmap <leader>z :JsDoc<CR>
 
-" quick save
-map <leader>w :w<ENTER>
+" Delete current visual selection and dump in black hole buffer before pasting
+" Used when you want to paste over something without it getting copied to
+" Vim's default buffer
+vnoremap <leader>p "_dP
 
-" " Copy to clipboard
-vnoremap  <leader>y  "+y
-nnoremap  <leader>Y  "+yg_
-nnoremap  <leader>y  "+y
-nnoremap  <leader>yy  "+yy
+" ============================================================================ "
+" ===                                 MISC.                                === "
+" ============================================================================ "
 
-" " Paste from clipboard
-nnoremap <leader>p "+p
-nnoremap <leader>P "+P
-vnoremap <leader>p "+p
-vnoremap <leader>P "+P
+" Automaticaly close nvim if NERDTree is only thing left open
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-"Nerd Tree Mappings
-map <C-n> :NERDTreeToggle<CR>
+" === Search === "
+" ignore case when searching
+set ignorecase
 
-"Nerdcommenter
-map <leader>c v<leader>c<space><ESC>
+" if the search string has an upper case letter in it, the search will be case sensitive
+set smartcase
 
-" upper/lower word
-nmap <leader>u mQviwU`Q
-nmap <leader>l mQviwu`Q
+" Automatically re-read file if a change was detected outside of vim
+set autoread
 
-" upper/lower first char of word
-nmap <leader>U mQgewvU`Q
-nmap <leader>L mQgewvu`Q
+" Enable line numbers
+set number
 
-" cd to the directory containing the file in the buffer
-nmap <silent> <leader>cd :lcd %:h<CR>
-
-" Create the directory containing the file in the buffer
-nmap <silent> <leader>md :!mkdir -p %:p:h<CR>
-
-" Some helpers to edit mode
-" http://vimcasts.org/e/14
-nmap <leader>ew :e <C-R>=expand('%:h').'/'<cr>
-nmap <leader>es :sp <C-R>=expand('%:h').'/'<cr>
-nmap <leader>ev :vsp <C-R>=expand('%:h').'/'<cr>
-nmap <leader>et :tabe <C-R>=expand('%:h').'/'<cr>
-
-" Swap two words
-nmap <silent> gw :s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR>`'
-
-" Underline the current line with '='
-nmap <silent> <leader>ul :t.<CR>Vr=
-
-" set text wrapping toggles
-nmap <silent> <leader>tw :set invwrap<CR>:set wrap?<CR>
-
-" find merge conflict markers
-nmap <silent> <leader>fc <ESC>/\v^[<=>]{7}( .*\|$)<CR>
-
-" Map the arrow keys to be based on display lines, not physical lines
-map <Down> gj
-map <Up> gk
-
-" Toggle hlsearch with <leader>hs
-nmap <leader>hs :set hlsearch! hlsearch?<CR>
-
-" Adjust viewports to the same size
-map <Leader>= <C-w>=
-
-if has("nvim")
-  " Use ESC to exit terminal mode
-  tnoremap <Esc> <C-\><C-n>
+" Set backups
+if has('persistent_undo')
+  set undofile
+  set undolevels=3000
+  set undoreload=10000
 endif
+set backupdir=~/.local/share/nvim/backup " Don't put backups in current dir
+set backup
+set noswapfile
 
-if has("gui_macvim") && has("gui_running")
-  " Map command-[ and command-] to indenting or outdenting
-  " while keeping the original selection in visual mode
-  vmap <D-]> >gv
-  vmap <D-[> <gv
-
-  nmap <D-]> >>
-  nmap <D-[> <<
-
-  omap <D-]> >>
-  omap <D-[> <<
-
-  imap <D-]> <Esc>>>i
-  imap <D-[> <Esc><<i
-
-  " Bubble single lines
-  nmap <D-Up> [e
-  nmap <D-Down> ]e
-  nmap <D-k> [e
-  nmap <D-j> ]e
-
-  " Bubble multiple lines
-  vmap <D-Up> [egv
-  vmap <D-Down> ]egv
-  vmap <D-k> [egv
-  vmap <D-j> ]egv
-
-  " Map Command-# to switch tabs
-  map  <D-0> 0gt
-  imap <D-0> <Esc>0gt
-  map  <D-1> 1gt
-  imap <D-1> <Esc>1gt
-  map  <D-2> 2gt
-  imap <D-2> <Esc>2gt
-  map  <D-3> 3gt
-  imap <D-3> <Esc>3gt
-  map  <D-4> 4gt
-  imap <D-4> <Esc>4gt
-  map  <D-5> 5gt
-  imap <D-5> <Esc>5gt
-  map  <D-6> 6gt
-  imap <D-6> <Esc>6gt
-  map  <D-7> 7gt
-  imap <D-7> <Esc>7gt
-  map  <D-8> 8gt
-  imap <D-8> <Esc>8gt
-  map  <D-9> 9gt
-  imap <D-9> <Esc>9gt
-else
-  " Map command-[ and command-] to indenting or outdenting
-  " while keeping the original selection in visual mode
-  vmap <A-]> >gv
-  vmap <A-[> <gv
-
-  nmap <A-]> >>
-  nmap <A-[> <<
-
-  omap <A-]> >>
-  omap <A-[> <<
-
-  imap <A-]> <Esc>>>i
-  imap <A-[> <Esc><<i
-
-  " Bubble single lines
-  nmap <C-Up> [e
-  nmap <C-Down> ]e
-  nmap <C-k> [e
-  nmap <C-j> ]e
-
-  " Bubble multiple lines
-  vmap <C-Up> [egv
-  vmap <C-Down> ]egv
-  vmap <C-k> [egv
-  vmap <C-j> ]egv
-
-""
-"" Mouse
-""
-  " Make shift-insert work like in Xterm
-  map <S-Insert> <MiddleMouse>
-  map! <S-Insert> <MiddleMouse>
-  :set mouse=nicr
-
-  " Map Control-# to switch tabs
-  map  <C-0> 0gt
-  imap <C-0> <Esc>0gt
-  map  <C-1> 1gt
-  imap <C-1> <Esc>1gt
-  map  <C-2> 2gt
-  imap <C-2> <Esc>2gt
-  map  <C-3> 3gt
-  imap <C-3> <Esc>3gt
-  map  <C-4> 4gt
-  imap <C-4> <Esc>4gt
-  map  <C-5> 5gt
-  imap <C-5> <Esc>5gt
-  map  <C-6> 6gt
-  imap <C-6> <Esc>6gt
-  map  <C-7> 7gt
-  imap <C-7> <Esc>7gt
-  map  <C-8> 8gt
-  imap <C-8> <Esc>8gt
-  map  <C-9> 9gt
-  imap <C-9> <Esc>9gt
+" Reload icons after init source
+if exists('g:loaded_webdevicons')
+  call webdevicons#refresh()
 endif
-
-""
-"" Tabs
-""
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-""
-"" Command-Line Mappings
-""
-
-" After whitespace, insert the current directory into a command-line path
-cnoremap <expr> <C-P> getcmdline()[getcmdpos()-2] ==# ' ' ? expand('%:p:h') : "\<C-P>"
-
-" custom reload command
-command! Reload execute $MYVIMRC
-
-" terminal - TODO maybe use me
-"command! -nargs=* T split | terminal <args>
-"command! -nargs=* VT vsplit | terminal <args>
-
-" terminal vertical split - TODO FIX ME
-"map <leader>vst vsplit|terminal
-
-" terminal horizonal split -  TODO Fix ME
-"map <leader>st split|terminal
-
-
-"
-" ======= End Key Mappings =======
-"
