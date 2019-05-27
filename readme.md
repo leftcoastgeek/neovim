@@ -3,23 +3,15 @@ install neovim
 
 install python 3
 `brew install python3`
- make sure your brewed python(3) is in your path
-`which python` should produce /usr/local/bin/python
-
-install silver searcher
-`brew install the_silver_searcher`
 
 update neovim, need this for the deoplete plugin.
-`pip3 install --upgrade neovim`
+`pip3 install --user pynvim`
 
 set up neovim
 *to use an exsiting vim set up follow the instructions here [nvim-from-vim](https://neovim.io/doc/user/nvim.html#nvim-from-vim)
 
 *install vimplug `curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
 https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`
-
-*install plugins `curl -fLo ~/.config/nvim/init.vim \
-https://raw.githubusercontent.com/leftcoastgeek/neovim/master/init.vim`
 
 install nerd fonts
 install all fonts from the install script here: https://github.com/ryanoasis/nerd-fonts
